@@ -120,3 +120,23 @@ void BPlusTree::splitInternalNode(InternalNode* internal) {
         // Propagate the split up to the parent
     }
 }
+
+int BPlusTree::search(int key) {
+    Node* current = root;
+    while (current && !current->isLeaf) {
+        InternalNode* internal = static_cast<InternalNode*>(current);
+        int i;
+        for (i = 0; i < MAX_KEYS && internal->keys[i] != 0 && key >= internal->keys[i]; ++i);
+        current = internal->children[i];
+    }
+
+    if (current) {
+        LeafNode* leaf = static_cast<LeafNode*>(current);
+        for (int i = 0; i < MAX_KEYS && leaf->keys[i] != 0; ++i) {
+            if (leaf->keys[i] == key) {
+                return leaf->values[i];
+            }
+        }
+    }
+    return -1; // Key not found
+}
