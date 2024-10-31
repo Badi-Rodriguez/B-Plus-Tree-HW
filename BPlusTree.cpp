@@ -58,3 +58,41 @@ void BPlusTree::insertRecursive(Node* node, int key, int value) {
         }
     }
 }
+
+void BPlusTree::splitLeafNode(LeafNode* leaf) {
+    LeafNode* newLeaf = new LeafNode();
+    int mid = MAX_KEYS / 2;
+
+    for (int i = mid; i < MAX_KEYS; ++i) {
+        newLeaf->keys[i - mid] = leaf->keys[i];
+        newLeaf->values[i - mid] = leaf->values[i];
+        leaf->keys[i] = 0;
+        leaf->values[i] = 0;
+    }
+
+    newLeaf->next = leaf->next;
+    leaf->next = newLeaf;
+
+    // Handle parent
+    if (!leaf->parent) {
+        InternalNode* newRoot = new InternalNode();
+        newRoot->keys[0] = newLeaf->keys[0];
+        newRoot->children[0] = leaf;
+        newRoot->children[1] = newLeaf;
+        leaf->parent = newLeaf->parent = newRoot;
+        root = newRoot;
+    } else {
+        InternalNode* parent = static_cast<InternalNode*>(leaf->parent);
+        int i;
+        for (i = 0; i < MAX_KEYS && parent->keys[i] != 0 && newLeaf->keys[0] > parent->keys[i]; ++i);
+
+        for (int j = MAX_KEYS; j > i; --j) {
+            parent->keys[j] = parent->keys[j - 1];
+            parent->children[j + 1] = parent->children[j];
+        }
+
+        parent->keys[i] = newLeaf->keys[0];
+        parent->children[i + 1] = newLeaf;
+        newLeaf->parent = parent;
+    }
+}
