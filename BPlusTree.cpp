@@ -96,3 +96,27 @@ void BPlusTree::splitLeafNode(LeafNode* leaf) {
         newLeaf->parent = parent;
     }
 }
+
+void BPlusTree::splitInternalNode(InternalNode* internal) {
+    InternalNode* newInternal = new InternalNode();
+    int mid = MAX_KEYS / 2;
+
+    for (int i = mid + 1, j = 0; i < MAX_KEYS; ++i, ++j) {
+        newInternal->keys[j] = internal->keys[i];
+        newInternal->children[j] = internal->children[i];
+        internal->keys[i] = 0;
+        internal->children[i] = nullptr;
+    }
+    newInternal->children[mid] = internal->children[MAX_KEYS];
+
+    if (!internal->parent) {
+        InternalNode* newRoot = new InternalNode();
+        newRoot->keys[0] = internal->keys[mid];
+        newRoot->children[0] = internal;
+        newRoot->children[1] = newInternal;
+        internal->parent = newInternal->parent = newRoot;
+        root = newRoot;
+    } else {
+        // Propagate the split up to the parent
+    }
+}
