@@ -1,32 +1,41 @@
+Tarea: Implementacion de funciones / Arboles B+
+
+Integrantes:
+
+- Badi Masud Rodriguez Ramirez
+
+GITHUB LINK - https://github.com/Badi-Rodriguez/B-Plus-Tree-HW
+
+// Componentes: BPlusTree.h, BPlusTree.cpp,m main.cpp
+
+// BPlusTree.h
+#ifndef BPLUSTREE_H
+#define BPLUSTREE_H
+
 #include <iostream>
 
 const int MAX_KEYS = 3; // Adjust this for a different order B+ Tree
 
+// Basic Node structure, supporting both internal and leaf nodes
 struct Node {
     bool isLeaf;
     int keys[MAX_KEYS];
     Node* parent;
 
-    Node(bool leaf = false) : isLeaf(leaf), parent(nullptr) {
-        for (int i = 0; i < MAX_KEYS; ++i) keys[i] = 0;
-    }
+    Node(bool leaf = false);
 };
 
 struct LeafNode : public Node {
     int values[MAX_KEYS];
     LeafNode* next;
 
-    LeafNode() : Node(true), next(nullptr) {
-        for (int i = 0; i < MAX_KEYS; ++i) values[i] = 0;
-    }
+    LeafNode();
 };
 
 struct InternalNode : public Node {
     Node* children[MAX_KEYS + 1];
 
-    InternalNode() : Node(false) {
-        for (int i = 0; i < MAX_KEYS + 1; ++i) children[i] = nullptr;
-    }
+    InternalNode();
 };
 
 class BPlusTree {
@@ -39,12 +48,35 @@ private:
     void insertRecursive(Node* node, int key, int value);
 
 public:
-    BPlusTree() : root(nullptr) {}
+    BPlusTree();
 
     void insert(int key, int value);
     int search(int key);
     void remove(int key);
 };
+
+#endif // BPLUSTREE_H
+
+// BPlusTree.cpp
+#include "BPlusTree.h"
+
+// Node constructor
+Node::Node(bool leaf) : isLeaf(leaf), parent(nullptr) {
+    for (int i = 0; i < MAX_KEYS; ++i) keys[i] = 0;
+}
+
+// LeafNode constructor
+LeafNode::LeafNode() : Node(true), next(nullptr) {
+    for (int i = 0; i < MAX_KEYS; ++i) values[i] = 0;
+}
+
+// InternalNode constructor
+InternalNode::InternalNode() : Node(false) {
+    for (int i = 0; i < MAX_KEYS + 1; ++i) children[i] = nullptr;
+}
+
+// BPlusTree constructor
+BPlusTree::BPlusTree() : root(nullptr) {}
 
 // Insert into a B+ Tree
 void BPlusTree::insert(int key, int value) {
@@ -169,8 +201,31 @@ int BPlusTree::search(int key) {
 }
 
 void BPlusTree::remove(int key) {
-    // Implement deletion logic (similar to insert, handle underflows)
+    // Step 1: Traverse to the leaf node
+    Node* current = root;
+    while (current && !current->isLeaf) {
+        InternalNode* internal = static_cast<InternalNode*>(current);
+        int i = 0;
+        while (i < MAX_KEYS && internal->keys[i] != 0 && key >= internal->keys[i]) {
+            i++;
+        }
+        current = internal->children[i];
+    }
+
+    // Step 2: Look for the key in the leaf node
+    if (current && current->isLeaf) {
+        LeafNode* leaf = static_cast<LeafNode*>(current);
+        for (int i = 0; i < MAX_KEYS; i++) {
+            if (leaf->keys[i] == key) {  // Key found
+                leaf->keys[i] = 0;      // "Delete" the key by setting it to 0
+                leaf->values[i] = 0;    // Also "delete" the value by setting it to 0
+                break;
+            }
+        }
+    }
 }
+
+#include "BPlusTree.h"
 
 int main() {
     BPlusTree tree;
