@@ -15,3 +15,14 @@ LeafNode::LeafNode() : Node(true), next(nullptr) {
 InternalNode::InternalNode() : Node(false) {
     for (int i = 0; i < MAX_KEYS + 1; ++i) children[i] = nullptr;
 }
+
+// BPlusTree constructor
+BPlusTree::BPlusTree() : root(nullptr) {}
+
+// Insert into a B+ Tree
+void BPlusTree::insert(int key, int value) {
+    if (!root) {
+        root = new LeafNode();
+    }
+    insertRecursive(root, key, value);
+}
