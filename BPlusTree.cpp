@@ -140,3 +140,28 @@ int BPlusTree::search(int key) {
     }
     return -1; // Key not found
 }
+
+void BPlusTree::remove(int key) {
+    // Step 1: Traverse to the leaf node
+    Node* current = root;
+    while (current && !current->isLeaf) {
+        InternalNode* internal = static_cast<InternalNode*>(current);
+        int i = 0;
+        while (i < MAX_KEYS && internal->keys[i] != 0 && key >= internal->keys[i]) {
+            i++;
+        }
+        current = internal->children[i];
+    }
+
+    // Step 2: Look for the key in the leaf node
+    if (current && current->isLeaf) {
+        LeafNode* leaf = static_cast<LeafNode*>(current);
+        for (int i = 0; i < MAX_KEYS; i++) {
+            if (leaf->keys[i] == key) {  // Key found
+                leaf->keys[i] = 0;      // "Delete" the key by setting it to 0
+                leaf->values[i] = 0;    // Also "delete" the value by setting it to 0
+                break;
+            }
+        }
+    }
+}
