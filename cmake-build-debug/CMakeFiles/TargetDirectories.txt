@@ -1,0 +1,3 @@
+C:/Users/Badir/Documents/projects/B-Plus-Tree-HW/cmake-build-debug/CMakeFiles/B_Plus_Tree_HW.dir
+C:/Users/Badir/Documents/projects/B-Plus-Tree-HW/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Badir/Documents/projects/B-Plus-Tree-HW/cmake-build-debug/CMakeFiles/rebuild_cache.dir
